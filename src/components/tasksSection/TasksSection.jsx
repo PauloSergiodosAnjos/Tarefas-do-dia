@@ -1,35 +1,30 @@
 import axios from "axios"
-import { useEffect, useRef, useState } from "react"
+import { useEffect } from "react"
 
-export default function TasksSection() {
-    const [data, setData] = useState()
-    const [newData, setNewData] = useState(data)
-
-    const fetchData = async ()=> {
-        try {
-            const response = await axios.get("http://localhost:3001/tasks")
-            setData(response.data)
-            console.log(response.data);
-        } catch (error) {
-            alert("Erro ao fazer requisicao GET", error)
+export default function TasksSection({data, setData}) {
+    useEffect(()=>{
+        async function fetchData() {
+            try {
+                const response = await axios.get("http://localhost:3001/tasks")
+                setData(response.data)
+                console.log(response.data);
+            } catch (error) {
+                alert("Erro ao fazer requisicao GET", error)
+            }
         }
-    }
-    useEffect(async ()=>{
         fetchData()
     }, [])
 
-    useEffect(()=>{
-        setNewData(data)
-    }, [data])
-
     return(
     <div>
-        {newData.length > 0 ? (
-            newData.map((element, index)=>{
+        {data.length > 0 ? (
+            data.map((element, index)=>{
                 return(
                     <div key={index}>
                         <h2>{element.title}</h2>
-                        <p>{element.task}</p>
+                        <ul>
+                            <li>{element.task}</li>
+                        </ul>
                     </div>
                 )
             })

@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useState } from "react"
 
-export default function Form() {
+export default function Form({addTask}) {
     const [title, setTitle] = useState("")
     const [task, setTask] = useState("")
 
@@ -19,10 +19,9 @@ export default function Form() {
         }
         try {
             const response = await axios.post("http://localhost:3001/tasks", postData)
-            console.log(response);
+            addTask(postData)
             setTitle("")
             setTask("")
-            await fetchData()
         } catch (error) {
             console.log("Erro ao fazer a requisicao POST", error);
         }
@@ -42,9 +41,7 @@ export default function Form() {
         <input onChange={titleValue} value={title} type="text" id="title" />
         <label htmlFor="task">Tarefa</label>
         <input onChange={taskValue} value={task} type="text" id="task" />
-        <button onClick={()=> {
-            postTask(title, task)
-        }}>Salvar</button>
+        <button onClick={()=> postTask(title, task)}>Salvar</button>
     </div>
     )
 }
