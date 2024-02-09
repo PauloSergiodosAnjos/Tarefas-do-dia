@@ -27,14 +27,6 @@ export default function Form({addTask}) {
         }
     }
 
-    const editTask = ()=> {
-
-    }
-
-    const deleteTask = ()=> {
-        
-    }
-
     return(
     <div>
         <label htmlFor="task">Titulo</label>

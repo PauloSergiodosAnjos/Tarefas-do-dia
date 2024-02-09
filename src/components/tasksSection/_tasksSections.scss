@@ -1,0 +1,12 @@
+ul {
+    display: flex;
+    gap: 1rem;
+}
+
+.status {
+    display: flex;
+    gap: 0.5rem;
+    span {
+        cursor: pointer;
+    }
+}
