@@ -1,20 +1,21 @@
 import { useState } from "react";
 import Form from "./components/form/Form";
 import TasksSection from "./components/tasksSection/TasksSection";
+import OptionsContext from "./components/contexts/OptionsContext";
+import TasksConcluidsContext from "./components/contexts/TasksConcluidsContext";
 
 export default function App() {
-  const [data, setData] = useState([]);
-
-  const addTask = (newTask) => {
-    setData([...data, newTask])
-  }
+  const [data, setData] = useState([])
+  const [concluidTask, setConcluidTask] = useState([])
 
   return(
-    <>
-    <h1>Lista de Tarefas</h1>
-    <Form addTask={addTask}/>
-    <TasksSection data={data} setData={setData}/>
-    </>
+    <OptionsContext.Provider value={{data, setData}}>
+      <TasksConcluidsContext.Provider value={{concluidTask, setConcluidTask}}>
+      <h1>Lista de Tarefas</h1>
+      <Form />
+      <TasksSection />
+      </TasksConcluidsContext.Provider>
+    </OptionsContext.Provider>
   )
 }
 

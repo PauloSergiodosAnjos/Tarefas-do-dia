@@ -1,6 +1,11 @@
 ul {
     display: flex;
     gap: 1rem;
+    flex-direction: column;
+    li {
+        display: flex;
+        gap: 1rem;
+    }
 }
 
 .status {
@@ -9,4 +14,9 @@ ul {
     span {
         cursor: pointer;
     }
+}
+
+.check-active {
+    color: green;
+    text-decoration: line-through;
 }

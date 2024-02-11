@@ -1,39 +1,32 @@
-import axios from "axios"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import OptionsContext from "../contexts/OptionsContext"
 
-export default function Form({addTask}) {
-    const [title, setTitle] = useState("")
+export default function Form() {
     const [task, setTask] = useState("")
-
-    const titleValue = (ev)=>{
-        setTitle(ev.target.value)
-    }
+    const {data, setData} = useContext(OptionsContext)
+    
     const taskValue = (ev)=>{
         setTask(ev.target.value)
     }
+
+    const generateRandomId = () => {
+        return Math.random().toString(36).substr(2, 9);
+    };
     
-    const postTask = async (titleParam, taskParam)=> {
-        const postData = {
-            title: titleParam,
-            task: taskParam
-        }
-        try {
-            const response = await axios.post("http://localhost:3001/tasks", postData)
-            addTask(postData)
-            setTitle("")
+    const postTask = (taskParam)=> {
+            const postData = {
+                id: generateRandomId(),
+                task: taskParam
+            }
+            setData([...data, postData])
             setTask("")
-        } catch (error) {
-            console.log("Erro ao fazer a requisicao POST", error);
-        }
     }
 
     return(
     <div>
-        <label htmlFor="task">Titulo</label>
-        <input onChange={titleValue} value={title} type="text" id="title" />
         <label htmlFor="task">Tarefa</label>
         <input onChange={taskValue} value={task} type="text" id="task" />
-        <button onClick={()=> postTask(title, task)}>Salvar</button>
+        <button onClick={()=> {postTask(task)}}>Salvar</button>
     </div>
     )
 }

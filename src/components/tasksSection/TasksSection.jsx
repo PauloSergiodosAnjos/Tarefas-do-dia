@@ -1,41 +1,58 @@
-import axios from "axios"
-import { useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 import "./_tasksSections.scss" 
+import OptionsContext from "../contexts/OptionsContext"
+import TasksConcluidsContext from "../contexts/TasksConcluidsContext"
 
-export default function TasksSection({data, setData}) {
-    useEffect(()=>{
-        fetchData()
-    }, [])
+export default function TasksSection() {
 
-    async function fetchData() {
-        try {
-            const response = await axios.get("http://localhost:3001/tasks")
-            setData(response.data)
-        } catch (error) {
-            alert("Erro ao fazer requisicao GET", error)
+    const {data, setData} = useContext(OptionsContext)
+    const {concluidTask, setConcluidTask}= useContext(TasksConcluidsContext)
+    const [check, setCheck] = useState(Array(data.length).fill(false))
+
+    const deleteTask = (id)=> {
+        setData(data.filter(task => task.id !== id))
+    }
+
+    const editTask = (id) => {
+        const editedValue = prompt("fodase")
+        const newData = data.map((task)=>{
+            if (task.id === id) {
+                return {...task, task: editedValue}
+            }
+            return task
+        })
+        console.log(newData);
+        setData(newData)
+    }
+
+    const checkTask = (index, id)=> {
+        const newCheck = [...check]
+        newCheck[index] = !newCheck[index]
+        setCheck(newCheck)
+        const task = data.find(task => task.id === id)
+        if (newCheck[index]) {
+            setConcluidTask([...concluidTask, task.task])
+        } else {
+            setConcluidTask(concluidTask.filter(concluid => concluid !== task.task))
         }
     }
-
-    const editTask = ()=> {
-        
-    }
-
-    const deleteTask = async(id)=> {
-        const response = await axios.delete(`http://localhost:3001/tasks/${id}`)
-    }
-
+    
     return(
     <div>
+        <h1>Tarefas Concluidas</h1>
+        {concluidTask.length > 0 ? (
+        <h3>{concluidTask.length}</h3>
+        ) : <h2>Nao tem</h2>}
+
         {data.length > 0 ? (
             data.map((element, index)=>{
                 return(
                     <div key={index}>
-                        <h2>{element.title}</h2>
                         <ul>
-                            <li>{element.task}</li>
+                            <li className={`check-${check[index] ? "active" : ""}`}>{element.task}</li>
                             <div className="status">
-                                <span>Feito</span>
-                                <span>Editar</span>
+                                <span onClick={()=> checkTask(index, element.id)}>Feito</span>
+                                <span onClick={()=> editTask(element.id)}>Editar</span>
                                 <span onClick={()=> deleteTask(element.id)}>Excluir</span>
                             </div>
                         </ul>
