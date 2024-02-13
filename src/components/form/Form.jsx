@@ -1,25 +1,30 @@
 import axios from "axios"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import DataContext from "../contexts/DataContext"
 
-export default function Form({addTask}) {
+export default function Form() {
     const [title, setTitle] = useState("")
     const [task, setTask] = useState("")
+    const {data, setData} = useContext(DataContext)
 
-    const titleValue = (ev)=>{
-        setTitle(ev.target.value)
+    async function fetchData() {
+        try {
+            const response = await axios.get("http://localhost:3001/tasks")
+            setData(response.data)
+        } catch (error) {
+            alert("Erro ao fazer requisicao GET", error)
+        }
     }
-    const taskValue = (ev)=>{
-        setTask(ev.target.value)
-    }
-    
+
     const postTask = async (titleParam, taskParam)=> {
-        const postData = {
+        const newData = {
             title: titleParam,
             task: taskParam
         }
         try {
-            const response = await axios.post("http://localhost:3001/tasks", postData)
-            addTask(postData)
+            await axios.post("http://localhost:3001/tasks", newData)
+            setData([...data, newData])
+            await fetchData()
             setTitle("")
             setTask("")
         } catch (error) {
@@ -30,9 +35,9 @@ export default function Form({addTask}) {
     return(
     <div>
         <label htmlFor="task">Titulo</label>
-        <input onChange={titleValue} value={title} type="text" id="title" />
+        <input onChange={(ev)=> setTitle(ev.target.value)} value={title} type="text" id="title" />
         <label htmlFor="task">Tarefa</label>
-        <input onChange={taskValue} value={task} type="text" id="task" />
+        <input onChange={(ev)=> setTask(ev.target.value)} value={task} type="text" id="task" />
         <button onClick={()=> postTask(title, task)}>Salvar</button>
     </div>
     )

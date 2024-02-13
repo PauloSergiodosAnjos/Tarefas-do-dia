@@ -1,10 +1,14 @@
 import axios from "axios"
-import { useEffect } from "react"
+import { useContext, useEffect } from "react"
 import "./_tasksSections.scss" 
+import DataContext from "../contexts/DataContext"
 
-export default function TasksSection({data, setData}) {
+export default function TasksSection() {
+    const {data, setData} = useContext(DataContext)
+    
     useEffect(()=>{
         fetchData()
+        console.log(data);
     }, [])
 
     async function fetchData() {
@@ -20,8 +24,13 @@ export default function TasksSection({data, setData}) {
         
     }
 
-    const deleteTask = async(id)=> {
-        const response = await axios.delete(`http://localhost:3001/tasks/${id}`)
+    const deleteTask = async (id)=> {
+        try {
+            await axios.delete(`http://localhost:3001/tasks/${id}`)
+            setData(data.filter(task => task.id !== id))
+        } catch (error) {
+            console.log("Erro ao excluir task", error);
+        }
     }
 
     return(
@@ -36,7 +45,10 @@ export default function TasksSection({data, setData}) {
                             <div className="status">
                                 <span>Feito</span>
                                 <span>Editar</span>
-                                <span onClick={()=> deleteTask(element.id)}>Excluir</span>
+                                <span onClick={async()=> {
+                                    deleteTask(element.id)
+                                    await fetchData()
+                                }}>Excluir</span>
                             </div>
                         </ul>
                     </div>
