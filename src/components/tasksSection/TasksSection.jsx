@@ -1,27 +1,36 @@
 import axios from "axios"
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 import "./_tasksSections.scss" 
 import DataContext from "../contexts/DataContext"
 
 export default function TasksSection() {
     const {data, setData} = useContext(DataContext)
+    const [toggleCheck, setToggleCheck] = useState(false)
     
     useEffect(()=>{
         fetchData()
-        console.log(data);
     }, [])
 
     async function fetchData() {
         try {
-            const response = await axios.get("http://localhost:3001/tasks")
-            setData(response.data)
+            const responseToGet = await axios.get(`http://localhost:3001/tasks`)
+            setData(responseToGet.data)
         } catch (error) {
             alert("Erro ao fazer requisicao GET", error)
         }
     }
 
-    const editTask = ()=> {
-        
+    const editTask = async (id, value)=> {
+        const taskToUpdate = data.find(element => element.id === id)
+        try {
+            await axios.put(`http://localhost:3001/tasks/${id}`, {
+                title: taskToUpdate.title,
+                task: value
+            })
+            await fetchData()
+        } catch (error) {
+            console.log("erro ao fazer PUT", error);
+        }
     }
 
     const deleteTask = async (id)=> {
@@ -41,10 +50,16 @@ export default function TasksSection() {
                     <div key={index}>
                         <h2>{element.title}</h2>
                         <ul>
-                            <li>{element.task}</li>
+                            <li className={toggleCheck === true ? "toggleCheck" : ""}>{element.task}</li>
                             <div className="status">
-                                <span>Feito</span>
-                                <span>Editar</span>
+                                <span onClick={()=>{
+                                    setToggleCheck(!toggleCheck)
+                                }}>Feito</span>
+                                <span onClick={async()=> {
+                                    const value = prompt("fodase")
+                                    editTask(element.id, value)
+                                    await fetchData()
+                                }}>Editar</span>
                                 <span onClick={async()=> {
                                     deleteTask(element.id)
                                     await fetchData()
